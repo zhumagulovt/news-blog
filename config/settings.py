@@ -43,7 +43,10 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
 
     # local apps
-    "news_blog.users"
+    "news_blog.users",
+
+    # third-party apps
+    "rest_framework"
 ]
 
 MIDDLEWARE = [
