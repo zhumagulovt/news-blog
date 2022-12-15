@@ -1,12 +1,16 @@
+from django.contrib.auth.password_validation import validate_password
+from django.core import exceptions
 from django.contrib.auth import get_user_model
+
 from rest_framework import serializers
+from rest_framework.settings import api_settings
 
 User = get_user_model()
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
     """Serializer for registration"""
-    # Make first_name and last_name fields required
+    # Сделать поля first_name и last_name обязательными в сериалайзере
     first_name = serializers.CharField(max_length=150)
     last_name = serializers.CharField(max_length=150)
 
@@ -18,12 +22,29 @@ class RegistrationSerializer(serializers.ModelSerializer):
                   'password', 'password_confirm']
 
     def validate(self, data):
-        """Check that password and password_confirm are same"""
-        # remove non-model field from data
+        """
+        Проверить похоже ли подтверждение пароля на сам пароль.
+        Провести валидацию пароля с помощью валидатора django.
+        """
+        # убрать из data password_confirm не являющийся полем User
         password_confirm = data.pop('password_confirm', None)
 
         if data['password'] != password_confirm:
-            raise serializers.ValidationError('Password confirmation is wrong')
+            raise serializers.ValidationError(
+                {'password_confirm': 'Подтверждение пароля неверное.'}
+            )
+
+        # валидация пароля
+        user = User(**data)
+        password = data.get('password')
+
+        try:
+            validate_password(password, user)
+        except exceptions.ValidationError as e:
+            serializer_error = serializers.as_serializer_error(e)
+            raise serializers.ValidationError(
+                {'password': serializer_error[api_settings.NON_FIELD_ERRORS_KEY]}
+            )
 
         return data
 
