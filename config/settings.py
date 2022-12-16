@@ -49,7 +49,8 @@ INSTALLED_APPS = [
 
     # third-party apps
     "rest_framework",
-    "rest_framework_simplejwt"
+    "rest_framework_simplejwt",
+    "drf_spectacular"
 ]
 
 MIDDLEWARE = [
@@ -130,12 +131,15 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# django-rest-framework
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
-    )
+    ),
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
+# djangorestframework-simplejwt
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
@@ -162,4 +166,12 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
     'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
+}
+
+# drf-spectacular
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'News Blog API',
+    'DESCRIPTION': 'Документация API новостного блога',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
 }
