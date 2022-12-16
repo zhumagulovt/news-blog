@@ -10,6 +10,7 @@ class CustomUserAdmin(DjangoUserAdmin):
     Админка для кастомного пользователя.
     При создании нового пользователя добавляет в форму имя и фамилию.
     """
+
     add_fieldsets = (
         (
             None,

@@ -15,11 +15,12 @@ class RegistrationAPIView(GenericAPIView):
     """
     Регистрация по полям: Имя, Фамилия, Логин, Пароль, Подтверждение пароля.
     """
+
     serializer_class = RegistrationSerializer
     authentication_classes = ()
 
     # сообщение в response
-    success_message = 'Новый пользователь успешно создан'
+    success_message = "Новый пользователь успешно создан"
 
     @extend_schema(
         responses={201: OpenApiResponse(description=success_message)}
@@ -29,7 +30,4 @@ class RegistrationAPIView(GenericAPIView):
         serializer.is_valid(raise_exception=True)
         serializer.create(serializer.validated_data)
 
-        return Response(
-            self.success_message,
-            status=status.HTTP_201_CREATED
-        )
+        return Response(self.success_message, status=status.HTTP_201_CREATED)

@@ -9,7 +9,10 @@ class CustomUser(AbstractUser):
     Добавил поле для фото профиля.
     Сделал имя и фамилию обязательными полями.
     """
-    profile_picture = models.ImageField("Фото профиля", upload_to="profile_pictures/", blank=True)
+
+    profile_picture = models.ImageField(
+        "Фото профиля", upload_to="profile_pictures/", blank=True
+    )
     first_name = models.CharField("Имя", max_length=150)
     last_name = models.CharField("Фамилия", max_length=150)
     objects = UserManager()

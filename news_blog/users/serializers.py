@@ -15,8 +15,8 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'username',
-                  'password', 'password_confirm']
+        fields = ["first_name", "last_name", "username",
+                  "password", "password_confirm"]
 
     def validate(self, data):
         """
@@ -24,23 +24,23 @@ class RegistrationSerializer(serializers.ModelSerializer):
         Провести валидацию пароля с помощью валидатора django.
         """
         # убрать из data password_confirm не являющийся полем User
-        password_confirm = data.pop('password_confirm', None)
+        password_confirm = data.pop("password_confirm", None)
 
-        if data['password'] != password_confirm:
+        if data["password"] != password_confirm:
             raise serializers.ValidationError(
-                {'password_confirm': 'Подтверждение пароля неверное.'}
+                {"password_confirm": "Подтверждение пароля неверное."}
             )
 
         # валидация пароля
         user = User(**data)
-        password = data.get('password')
+        password = data.get("password")
 
         try:
             validate_password(password, user)
         except exceptions.ValidationError as e:
             serializer_error = serializers.as_serializer_error(e)
             raise serializers.ValidationError(
-                {'password': serializer_error[api_settings.NON_FIELD_ERRORS_KEY]}
+                {"password": serializer_error[api_settings.NON_FIELD_ERRORS_KEY]} # noqa
             )
 
         return data
