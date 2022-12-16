@@ -10,9 +10,6 @@ User = get_user_model()
 
 class RegistrationSerializer(serializers.ModelSerializer):
     """Serializer for registration"""
-    # Сделать поля first_name и last_name обязательными в сериалайзере
-    first_name = serializers.CharField(max_length=150)
-    last_name = serializers.CharField(max_length=150)
 
     password_confirm = serializers.CharField()
 
