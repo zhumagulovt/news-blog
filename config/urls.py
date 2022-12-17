@@ -24,10 +24,10 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/v1/users/", include("news_blog.users.urls")),
     # OpenAPI without UI
-    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+    path("api/v1/schema/", SpectacularAPIView.as_view(), name="schema"),
     # Swagger
     path(
-        "api/schema/swagger-ui/",
+        "api/v1/schema/swagger-ui/",
         SpectacularSwaggerView.as_view(url_name="schema"),
         name="swagger-ui",
     ),
