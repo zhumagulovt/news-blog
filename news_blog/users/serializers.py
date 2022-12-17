@@ -49,3 +49,12 @@ class RegistrationSerializer(serializers.ModelSerializer):
         user = User.objects.create_user(**validated_data)
 
         return user
+
+
+class UserSerializer(serializers.ModelSerializer):
+    """Serializer для получения или изменения профиля пользователя"""
+
+    class Meta:
+        model = User
+        fields = ['id', 'first_name', 'last_name',
+                  'username', 'profile_picture']
