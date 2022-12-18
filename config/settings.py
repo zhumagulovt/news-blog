@@ -51,7 +51,8 @@ THIRD_PARTY_APPS = [
 ]
 
 LOCAL_APPS = [
-    "news_blog.users"
+    "news_blog.users",
+    "news_blog.posts"
 ]
 
 # Application definition
