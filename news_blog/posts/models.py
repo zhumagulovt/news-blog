@@ -19,3 +19,6 @@ class Post(models.Model):
     class Meta:
         # Сортировка по дате
         ordering = ["-created_at"]
+
+        verbose_name = "Пост"
+        verbose_name_plural = "Посты"
