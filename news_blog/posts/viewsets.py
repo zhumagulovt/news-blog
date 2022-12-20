@@ -29,7 +29,7 @@ from .permissions import IsOwnerOrReadOnly
     )
 )
 class PostViewSet(ModelViewSet):
-    queryset = Post.objects.all()
+    queryset = Post.objects.select_related('category', 'author')
     serializer_class = PostSerializer
     permission_classes = (IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
 
