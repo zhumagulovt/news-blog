@@ -4,14 +4,28 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 
+class Category(models.Model):
+    """Модель для категорий постов"""
+    name = models.CharField("Название", max_length=150)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "Категория"
+        verbose_name_plural = "Категории"
+
+
 class Post(models.Model):
     """Модель для постов"""
     title = models.CharField("Заголовок", max_length=150)
     content = models.TextField("Содержание")
     author = models.ForeignKey(User, on_delete=models.CASCADE,
                                related_name='posts', verbose_name='Автор')
+    category = models.ForeignKey(Category, on_delete=models.CASCADE,
+                                 related_name='posts', verbose_name='Категория') # noqa
     image = models.ImageField("Фото", upload_to="post_images/", blank=True)
-    created_at = models.DateTimeField("Дата создания: ", auto_now_add=True)
+    created_at = models.DateTimeField("Дата создания", auto_now_add=True)
 
     def __str__(self):
         return self.title
