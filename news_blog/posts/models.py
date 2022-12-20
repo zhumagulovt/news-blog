@@ -22,3 +22,17 @@ class Post(models.Model):
 
         verbose_name = "Пост"
         verbose_name_plural = "Посты"
+
+
+class Comment(models.Model):
+    """Модель для вложенных комментариев"""
+    post = models.ForeignKey(Post, on_delete=models.CASCADE,
+                             related_name='comments', verbose_name='Пост')
+    author = models.ForeignKey(User, on_delete=models.CASCADE,
+                               verbose_name='Автор')
+    content = models.TextField("Комментарий")
+
+    # Родительский комментарий
+    parent = models.ForeignKey("self", on_delete=models.CASCADE,
+                               related_name='replies', null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
