@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from news_blog.users.serializers import UserSerializer
 
-from .models import Post, Category
+from .models import Post, Category, Comment
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -29,3 +29,23 @@ class PostSerializer(serializers.ModelSerializer):
         model = Post
         fields = ['id', 'title', 'author', 'content',
                   'category', 'category_id', 'created_at', 'image']
+
+
+class RecursiveField(serializers.Serializer):
+    """
+    Поле сериалайзер для ссылки на самого себя
+    """
+    def to_representation(self, value):
+        serializer = self.parent.parent.__class__(value, context=self.context)
+        return serializer.data
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    """
+    Сериалайзер для вложенных комментариев
+    """
+    replies = RecursiveField(many=True)
+
+    class Meta:
+        model = Comment
+        fields = ['id', 'post', 'author', 'content', 'created_at', 'replies']
