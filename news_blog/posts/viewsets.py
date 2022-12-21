@@ -10,7 +10,7 @@ from drf_spectacular.utils import (
     OpenApiExample,
 )
 
-from .models import Post
+from .models import Post, Comment
 from .serializers import PostSerializer, CommentSerializer
 from .permissions import IsOwnerOrReadOnly
 
@@ -71,3 +71,9 @@ class PostViewSet(ModelViewSet):
 
         serializer = CommentSerializer(root_comments, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class CommentViewSet(ModelViewSet):
+
+    queryset = Comment.objects.select_related('author', 'post')
+    serializer_class = CommentSerializer

@@ -5,7 +5,8 @@ from rest_framework.routers import SimpleRouter
 from . import viewsets
 
 router = SimpleRouter()
-router.register('', viewsets.PostViewSet)
+router.register('posts', viewsets.PostViewSet)
+router.register('comments', viewsets.CommentViewSet)
 
 urlpatterns = [
     path('', include(router.urls))
