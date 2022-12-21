@@ -44,6 +44,7 @@ class CommentSerializer(serializers.ModelSerializer):
     """
     Сериалайзер для вложенных комментариев
     """
+    author = UserSerializer(read_only=True)
     replies = RecursiveField(many=True)
 
     class Meta:
