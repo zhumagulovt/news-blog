@@ -43,6 +43,19 @@ class PostViewSet(ModelViewSet):
     @action(
         detail=False, methods=["get"], permission_classes=[IsAuthenticated]
     )
+    def my_posts(self, request):
+        """Вернуть все посты пользователя"""
+        user = request.user
+        user_posts = user.posts.all()
+
+        serializer = self.get_serializer(user_posts, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @extend_schema(request=None)
+    @action(
+        detail=False, methods=["get"], permission_classes=[IsAuthenticated]
+    )
     def favorites(self, request):
         """Вернуть все посты которые пользователь лайкнул"""
 
@@ -72,30 +85,16 @@ class PostViewSet(ModelViewSet):
 
     @extend_schema(
         responses=CommentSerializer,
-        examples=[
-            OpenApiExample(
-                name="Example",
-                value=[
-                    {
-                        "id": 1,
-                        "post": 1,
-                        "author": 1,
-                        "content": "This is comment",
-                        "created_at": "2022-12-21T16:00:30.874038Z",
-                        "replies": [
-                            {
-                                "id": 2,
-                                "post": 1,
-                                "author": 1,
-                                "content": "This is reply for comment",
-                                "created_at": "2022-12-21T17:44:30.874038Z",
-                                "replies": [],
-                            }
-                        ],
-                    }
-                ],
-            )
-        ]
+        examples=[OpenApiExample(
+            name="Example",
+            value=[{"id": 1, "post": 1, "author": 1,
+                    "content": "This is comment",
+                    "created_at": "2022-12-21T16:00",
+                    "replies":
+                        [{"id": 2, "post": 1, "author": 1,
+                          "content": "This is reply for comment",
+                          "created_at": "2022-12-21T17:44",
+                          "replies": []}]}])]
     )
     @action(detail=True, methods=["get"])
     def comments(self, request, pk):
