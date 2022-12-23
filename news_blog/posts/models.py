@@ -28,7 +28,7 @@ class Post(models.Model):
     created_at = models.DateTimeField("Дата создания", auto_now_add=True)
 
     # Многие ко многим отношение поста и пользователя
-    likes = models.ManyToManyField(User)
+    likes = models.ManyToManyField(User, related_name='likes')
 
     def __str__(self):
         return self.title
