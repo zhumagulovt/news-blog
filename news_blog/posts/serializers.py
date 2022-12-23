@@ -31,7 +31,7 @@ class PostSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'author', 'content', 'is_liked',
                   'category', 'category_id', 'created_at', 'image']
 
-    def get_is_liked(self, obj):
+    def get_is_liked(self, obj) -> bool:
         user = self.context.get('request').user
 
         if obj.likes.filter(id=user.id).exists():

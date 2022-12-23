@@ -39,6 +39,37 @@ class PostViewSet(ModelViewSet):
         """При сохранении установить текущего пользователя как автора поста"""
         serializer.save(author=self.request.user)
 
+    @extend_schema(request=None)
+    @action(
+        detail=False, methods=["get"], permission_classes=[IsAuthenticated]
+    )
+    def favorites(self, request):
+        """Вернуть все посты которые пользователь лайкнул"""
+
+        user = request.user
+        favorite_posts = user.likes.all()
+
+        serializer = self.get_serializer(favorite_posts, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @extend_schema(request=None, responses=None)
+    @action(
+        detail=True, methods=["post"], permission_classes=[IsAuthenticated]
+    )
+    def like(self, request, pk):
+        """Поставить или отменить лайк"""
+
+        post = self.get_object()
+        user = request.user
+
+        if post.likes.filter(id=user.id).exists():
+            post.likes.remove(user)
+        else:
+            post.likes.add(user)
+
+        return Response(status=status.HTTP_200_OK)
+
     @extend_schema(
         responses=CommentSerializer,
         examples=[
@@ -79,20 +110,6 @@ class PostViewSet(ModelViewSet):
         serializer = CommentRepliesSerializer(root_comments, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
-    def like(self, request, pk):
-        """Поставить или отменить лайк"""
-
-        post = self.get_object()
-        user = request.user
-
-        if post.likes.filter(id=user.id).exists():
-            post.likes.remove(user)
-        else:
-            post.likes.add(user)
-
-        return Response(status=status.HTTP_200_OK)
-
 
 class CommentViewSet(mixins.CreateModelMixin,
                      mixins.UpdateModelMixin,
@@ -101,6 +118,7 @@ class CommentViewSet(mixins.CreateModelMixin,
 
     queryset = Comment.objects.select_related('author', 'post')
     serializer_class = CommentSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
 
     def perform_create(self, serializer):
         """
