@@ -14,6 +14,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class PostSerializer(serializers.ModelSerializer):
     author = UserSerializer(read_only=True)
+    is_liked = serializers.SerializerMethodField()
 
     # Поле для получения категории
     category = CategorySerializer(read_only=True)
@@ -27,8 +28,16 @@ class PostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ['id', 'title', 'author', 'content',
+        fields = ['id', 'title', 'author', 'content', 'is_liked',
                   'category', 'category_id', 'created_at', 'image']
+
+    def get_is_liked(self, obj):
+        user = self.context.get('request').user
+
+        if obj.likes.filter(id=user.id).exists():
+            return True
+
+        return False
 
 
 class CommentSerializer(serializers.ModelSerializer):
