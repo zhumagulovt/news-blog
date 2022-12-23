@@ -1,6 +1,9 @@
 from rest_framework import status, mixins
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import (
+    IsAuthenticatedOrReadOnly,
+    IsAuthenticated
+)
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -64,7 +67,7 @@ class PostViewSet(ModelViewSet):
         ]
     )
     @action(detail=True, methods=["get"])
-    def comments(self, request, *args, **kwargs):
+    def comments(self, request, pk):
         """Получить все комментарии поста"""
         post = self.get_object()
 
@@ -75,6 +78,20 @@ class PostViewSet(ModelViewSet):
 
         serializer = CommentRepliesSerializer(root_comments, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
+    def like(self, request, pk):
+        """Поставить или отменить лайк"""
+
+        post = self.get_object()
+        user = request.user
+
+        if post.likes.filter(id=user.id).exists():
+            post.likes.remove(user)
+        else:
+            post.likes.add(user)
+
+        return Response(status=status.HTTP_200_OK)
 
 
 class CommentViewSet(mixins.CreateModelMixin,
