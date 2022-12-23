@@ -27,6 +27,9 @@ class Post(models.Model):
     image = models.ImageField("Фото", upload_to="post_images/", blank=True)
     created_at = models.DateTimeField("Дата создания", auto_now_add=True)
 
+    # Многие ко многим отношение поста и пользователя
+    likes = models.ManyToManyField(User)
+
     def __str__(self):
         return self.title
 
