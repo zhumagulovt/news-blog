@@ -1,5 +1,5 @@
-from rest_framework import status
-from rest_framework.viewsets import ModelViewSet
+from rest_framework import status, mixins
+from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -11,7 +11,11 @@ from drf_spectacular.utils import (
 )
 
 from .models import Post, Comment
-from .serializers import PostSerializer, CommentSerializer
+from .serializers import (
+    PostSerializer,
+    CommentSerializer,
+    CommentRepliesSerializer
+)
 from .permissions import IsOwnerOrReadOnly
 
 
@@ -66,14 +70,23 @@ class PostViewSet(ModelViewSet):
 
         # Получить только корневые комментарии
         # Вложенные комментарии будут получены в сериалайзере
-        root_comments = post.comments.filter(parent=None)\
+        root_comments = post.comments.filter(parent=None) \
             .select_related('author', 'post')
 
-        serializer = CommentSerializer(root_comments, many=True)
+        serializer = CommentRepliesSerializer(root_comments, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class CommentViewSet(ModelViewSet):
+class CommentViewSet(mixins.CreateModelMixin,
+                     mixins.UpdateModelMixin,
+                     mixins.DestroyModelMixin,
+                     GenericViewSet):
 
     queryset = Comment.objects.select_related('author', 'post')
     serializer_class = CommentSerializer
+
+    def perform_create(self, serializer):
+        """
+        При сохранении установить текущего пользователя как автора комментария
+        """
+        serializer.save(author=self.request.user)

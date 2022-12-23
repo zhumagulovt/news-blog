@@ -31,6 +31,54 @@ class PostSerializer(serializers.ModelSerializer):
                   'category', 'category_id', 'created_at', 'image']
 
 
+class CommentSerializer(serializers.ModelSerializer):
+    author = UserSerializer(read_only=True)
+    parent = serializers.PrimaryKeyRelatedField(
+        write_only=True,
+        required=False,
+        queryset=Comment.objects.all()
+    )
+
+    class Meta:
+        model = Comment
+        fields = ['id', 'post', 'parent', 'author',
+                  'content', 'created_at']
+
+    def validate(self, data):
+        """Если комментарий вложенный т.е имеет поле parent,
+        проверить к одному ли посту относятся создаваемый
+        комментарий и родительский комментарий"""
+
+        parent_comment = data.get('parent', None)
+
+        if parent_comment:
+            post_of_new_comment = data.get('post', None)
+
+            post_of_parent_comment = parent_comment.post
+
+            if post_of_parent_comment != post_of_new_comment:
+                raise serializers.ValidationError(
+                    {'post': 'Неправильный id поста, родительский комментарий '
+                             'относится к другому посту'}
+                )
+
+        return data
+
+    def get_extra_kwargs(self):
+        """
+        При методе UPDATE или PATCH сделать поле post не записываемым.
+        Чтобы нельзя было поменять пост комментария.
+        """
+        extra_kwargs = super(CommentSerializer, self).get_extra_kwargs()
+
+        if self.instance:
+            post_kwarg = extra_kwargs.get('post', {})
+            post_kwarg['read_only'] = True
+            extra_kwargs['post'] = post_kwarg
+
+        return extra_kwargs
+
+
 class RecursiveField(serializers.Serializer):
     """
     Поле сериалайзер для ссылки на самого себя
@@ -40,13 +88,11 @@ class RecursiveField(serializers.Serializer):
         return serializer.data
 
 
-class CommentSerializer(serializers.ModelSerializer):
+class CommentRepliesSerializer(CommentSerializer):
     """
     Сериалайзер для вложенных комментариев
     """
-    author = UserSerializer(read_only=True)
-    replies = RecursiveField(many=True)
+    replies = RecursiveField(read_only=True, many=True)
 
-    class Meta:
-        model = Comment
-        fields = ['id', 'post', 'author', 'content', 'created_at', 'replies']
+    class Meta(CommentSerializer.Meta):
+        fields = CommentSerializer.Meta.fields + ['replies']
