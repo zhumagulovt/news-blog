@@ -6,6 +6,7 @@ from rest_framework.permissions import (
 )
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.filters import SearchFilter
 
 from drf_spectacular.utils import (
     extend_schema_view,
@@ -15,7 +16,7 @@ from drf_spectacular.utils import (
 
 from django_filters.rest_framework import DjangoFilterBackend
 
-from .models import Post, Comment
+from .models import Comment
 from .serializers import (
     PostSerializer,
     CommentSerializer,
@@ -37,14 +38,17 @@ class PostViewSet(ModelViewSet):
 
     serializer_class = PostSerializer
     permission_classes = (IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
-    filter_backends = (DjangoFilterBackend,)
+    filter_backends = (DjangoFilterBackend, SearchFilter)
     filterset_fields = ('category',)
+    search_fields = ('title',)
 
     def perform_create(self, serializer):
         """При сохранении установить текущего пользователя как автора поста"""
         serializer.save(author=self.request.user)
 
     def get_queryset(self):
+
+        # Если авторизован, то с полем is_liked
         if self.request.user.is_authenticated:
             return services.get_posts_with_is_liked(self.request.user)
         return services.get_posts()
