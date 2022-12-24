@@ -2,12 +2,13 @@ from django.urls import path, include
 
 from rest_framework.routers import SimpleRouter
 
-from . import viewsets
+from . import viewsets, views
 
 router = SimpleRouter()
 router.register('posts', viewsets.PostViewSet)
 router.register('comments', viewsets.CommentViewSet)
 
 urlpatterns = [
+    path('categories/', views.CategoryListAPIView.as_view()),
     path('', include(router.urls))
 ]
