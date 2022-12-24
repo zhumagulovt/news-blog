@@ -40,9 +40,7 @@ class PostViewSet(ModelViewSet):
         serializer.save(author=self.request.user)
 
     @extend_schema(request=None)
-    @action(
-        detail=False, methods=["get"], permission_classes=[IsAuthenticated]
-    )
+    @action(detail=False, methods=["get"], permission_classes=[IsAuthenticated])
     def my_posts(self, request):
         """Вернуть все посты пользователя"""
         user = request.user
@@ -53,9 +51,7 @@ class PostViewSet(ModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @extend_schema(request=None)
-    @action(
-        detail=False, methods=["get"], permission_classes=[IsAuthenticated]
-    )
+    @action(detail=False, methods=["get"], permission_classes=[IsAuthenticated])
     def favorites(self, request):
         """Вернуть все посты которые пользователь лайкнул"""
 
@@ -67,9 +63,7 @@ class PostViewSet(ModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @extend_schema(request=None, responses=None)
-    @action(
-        detail=True, methods=["post"], permission_classes=[IsAuthenticated]
-    )
+    @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
     def like(self, request, pk):
         """Поставить или отменить лайк"""
 
@@ -83,18 +77,19 @@ class PostViewSet(ModelViewSet):
 
         return Response(status=status.HTTP_200_OK)
 
+    # Сериалайзер не покажет replies в swagger, поэтому создал OpenApiExample для ясности
     @extend_schema(
-        responses=CommentSerializer,
-        examples=[OpenApiExample(
+        responses=CommentRepliesSerializer, examples=[OpenApiExample(
             name="Example",
-            value=[{"id": 1, "post": 1, "author": 1,
-                    "content": "This is comment",
-                    "created_at": "2022-12-21T16:00",
-                    "replies":
-                        [{"id": 2, "post": 1, "author": 1,
-                          "content": "This is reply for comment",
-                          "created_at": "2022-12-21T17:44",
-                          "replies": []}]}])]
+            value=[
+                {"id": 1, "post": 1, "author": 1, "content": "This is comment",
+                 "created_at": "2022-12-21T16:00", "replies": [
+                    {"id": 2, "post": 1, "author": 1, "content": "This is reply for comment",
+                     "created_at": "2022-12-21T17:44", "replies": []
+                     }]}
+                ]
+            )
+        ]
     )
     @action(detail=True, methods=["get"])
     def comments(self, request, pk):
@@ -103,8 +98,7 @@ class PostViewSet(ModelViewSet):
 
         # Получить только корневые комментарии
         # Вложенные комментарии будут получены в сериалайзере
-        root_comments = post.comments.filter(parent=None) \
-            .select_related('author', 'post')
+        root_comments = post.comments.filter(parent=None).select_related('author', 'post')
 
         serializer = CommentRepliesSerializer(root_comments, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)

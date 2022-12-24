@@ -15,8 +15,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["first_name", "last_name", "username",
-                  "password", "password_confirm"]
+        fields = ["first_name", "last_name", "username", "password", "password_confirm"]
 
     def validate(self, data):
         """
@@ -40,7 +39,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
         except exceptions.ValidationError as e:
             serializer_error = serializers.as_serializer_error(e)
             raise serializers.ValidationError(
-                {"password": serializer_error[api_settings.NON_FIELD_ERRORS_KEY]} # noqa
+                {"password": serializer_error[api_settings.NON_FIELD_ERRORS_KEY]}
             )
 
         return data

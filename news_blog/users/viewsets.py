@@ -10,18 +10,10 @@ from .serializers import UserSerializer
 
 
 @extend_schema_view(
-    retrieve=extend_schema(
-        description='Получить данные о текущем пользователе'
-    ),
-    partial_update=extend_schema(
-        description='Частично изменить текущего пользователя'
-    ),
-    update=extend_schema(
-        description='Полностью изменить текущего пользователя'
-    ),
-    destroy=extend_schema(
-        description='Удалить текущего пользователя'
-    )
+    retrieve=extend_schema(description='Получить данные о текущем пользователе'),
+    partial_update=extend_schema(description='Частично изменить текущего пользователя'),
+    update=extend_schema(description='Полностью изменить текущего пользователя'),
+    destroy=extend_schema(description='Удалить текущего пользователя')
 )
 class UserViewSet(mixins.RetrieveModelMixin,
                   mixins.UpdateModelMixin,

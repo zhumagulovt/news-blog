@@ -23,7 +23,7 @@ class Post(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE,
                                related_name='posts', verbose_name='Автор')
     category = models.ForeignKey(Category, on_delete=models.CASCADE,
-                                 related_name='posts', verbose_name='Категория') # noqa
+                                 related_name='posts', verbose_name='Категория')
     image = models.ImageField("Фото", upload_to="post_images/", blank=True)
     created_at = models.DateTimeField("Дата создания", auto_now_add=True)
 
@@ -45,11 +45,9 @@ class Comment(models.Model):
     """Модель для вложенных комментариев"""
     post = models.ForeignKey(Post, on_delete=models.CASCADE,
                              related_name='comments', verbose_name='Пост')
-    author = models.ForeignKey(User, on_delete=models.CASCADE,
-                               verbose_name='Автор')
+    author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Автор')
     content = models.TextField("Комментарий")
 
     # Родительский комментарий
-    parent = models.ForeignKey("self", on_delete=models.CASCADE,
-                               related_name='replies', null=True)
+    parent = models.ForeignKey("self", on_delete=models.CASCADE, related_name='replies', null=True)
     created_at = models.DateTimeField(auto_now_add=True)

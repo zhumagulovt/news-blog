@@ -67,8 +67,8 @@ class CommentSerializer(serializers.ModelSerializer):
 
             if post_of_parent_comment != post_of_new_comment:
                 raise serializers.ValidationError(
-                    {'post': 'Неправильный id поста, родительский комментарий '
-                             'относится к другому посту'}
+                    {'post': 'Неверный post_id, '
+                             'родительский комментарий относится к другому посту'}
                 )
 
         return data
