@@ -53,6 +53,7 @@ def set_or_remove_like(user: User, post: Post) -> None:
 def get_root_comments(post: Post) -> QuerySet:
     """Вернуть корневые комментарии поста"""
 
-    root_comments = post.comments.filter(parent=None).select_related('author', 'post')
+    root_comments = post.comments.filter(parent=None)\
+        .prefetch_related('author', 'replies')
 
     return root_comments
