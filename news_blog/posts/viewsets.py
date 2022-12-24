@@ -22,6 +22,7 @@ from .serializers import (
     CommentRepliesSerializer
 )
 from .permissions import IsOwnerOrReadOnly
+from . import services
 
 
 @extend_schema_view(
@@ -33,7 +34,7 @@ from .permissions import IsOwnerOrReadOnly
     destroy=extend_schema(description="Удалить пост"),
 )
 class PostViewSet(ModelViewSet):
-    queryset = Post.objects.select_related("category", "author")
+
     serializer_class = PostSerializer
     permission_classes = (IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
     filter_backends = (DjangoFilterBackend,)
@@ -43,13 +44,17 @@ class PostViewSet(ModelViewSet):
         """При сохранении установить текущего пользователя как автора поста"""
         serializer.save(author=self.request.user)
 
+    def get_queryset(self):
+        if self.request.user.is_authenticated:
+            return services.get_posts_with_is_liked(self.request.user)
+        return services.get_posts()
+
     @extend_schema(request=None)
     @action(detail=False, methods=["get"], permission_classes=[IsAuthenticated])
     def my_posts(self, request):
         """Вернуть все посты пользователя"""
         user = request.user
-        user_posts = user.posts.all()
-
+        user_posts = services.get_user_posts(user)
         serializer = self.get_serializer(user_posts, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -60,8 +65,7 @@ class PostViewSet(ModelViewSet):
         """Вернуть все посты которые пользователь лайкнул"""
 
         user = request.user
-        favorite_posts = user.likes.all()
-
+        favorite_posts = services.get_user_liked_posts(user)
         serializer = self.get_serializer(favorite_posts, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -73,11 +77,7 @@ class PostViewSet(ModelViewSet):
 
         post = self.get_object()
         user = request.user
-
-        if post.likes.filter(id=user.id).exists():
-            post.likes.remove(user)
-        else:
-            post.likes.add(user)
+        services.set_or_remove_like(user, post)
 
         return Response(status=status.HTTP_200_OK)
 
@@ -98,11 +98,12 @@ class PostViewSet(ModelViewSet):
     @action(detail=True, methods=["get"])
     def comments(self, request, pk):
         """Получить все комментарии поста"""
+
         post = self.get_object()
 
         # Получить только корневые комментарии
         # Вложенные комментарии будут получены в сериалайзере
-        root_comments = post.comments.filter(parent=None).select_related('author', 'post')
+        root_comments = services.get_root_comments(post)
 
         serializer = CommentRepliesSerializer(root_comments, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
