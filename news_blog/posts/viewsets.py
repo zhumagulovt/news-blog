@@ -13,6 +13,8 @@ from drf_spectacular.utils import (
     OpenApiExample,
 )
 
+from django_filters.rest_framework import DjangoFilterBackend
+
 from .models import Post, Comment
 from .serializers import (
     PostSerializer,
@@ -34,6 +36,8 @@ class PostViewSet(ModelViewSet):
     queryset = Post.objects.select_related("category", "author")
     serializer_class = PostSerializer
     permission_classes = (IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
+    filter_backends = (DjangoFilterBackend,)
+    filterset_fields = ('category',)
 
     def perform_create(self, serializer):
         """При сохранении установить текущего пользователя как автора поста"""
