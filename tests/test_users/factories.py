@@ -1,8 +1,5 @@
 from factory.django import DjangoModelFactory
-
-from faker import Faker
-
-faker = Faker()
+from factory import Faker
 
 
 class UserFactory(DjangoModelFactory):
@@ -10,10 +7,10 @@ class UserFactory(DjangoModelFactory):
     class Meta:
         model = 'users.CustomUser'
 
-    username = faker.user_name()
-    first_name = faker.first_name()
-    last_name = faker.last_name()
-    password = faker.password()
+    username = Faker('user_name')
+    first_name = Faker('first_name')
+    last_name = Faker('last_name')
+    password = 'password'
     is_active = True
 
     @classmethod
