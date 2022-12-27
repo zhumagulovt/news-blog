@@ -30,6 +30,7 @@ class TestProfile:
         response = api_client.patch(self.url, data=data)
 
         assert response.status_code == 200
+        assert user.username == new_user_data.username
 
     def test_delete_profile(self, logged_in_client):
         api_client, _ = logged_in_client
