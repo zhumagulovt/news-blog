@@ -1,6 +1,6 @@
 import pytest
 
-from news_blog.posts.models import Post, Comment
+from news_blog.posts.models import Comment
 
 
 @pytest.mark.django_db
