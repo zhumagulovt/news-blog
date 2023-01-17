@@ -23,6 +23,15 @@ class PostSerializer(serializers.ModelSerializer):
                   'category', 'created_at', 'image']
 
 
+class RecursiveFieldSerializer(serializers.Serializer):
+    """
+    Поле сериалайзер для ссылки на самого себя
+    """
+    def to_representation(self, value):
+        serializer = self.parent.parent.__class__(value, context=self.context)
+        return serializer.data
+
+
 class CommentSerializer(serializers.ModelSerializer):
     author = UserSerializer(read_only=True)
     parent = serializers.PrimaryKeyRelatedField(
@@ -30,11 +39,12 @@ class CommentSerializer(serializers.ModelSerializer):
         required=False,
         queryset=Comment.objects.all()
     )
+    replies = RecursiveFieldSerializer(read_only=True, many=True)
 
     class Meta:
         model = Comment
         fields = ['id', 'post', 'parent', 'author',
-                  'content', 'created_at']
+                  'content', 'created_at', 'replies']
 
     def validate(self, data):
         """Если комментарий вложенный т.е имеет поле parent,
@@ -69,22 +79,3 @@ class CommentSerializer(serializers.ModelSerializer):
             extra_kwargs['post'] = post_kwarg
 
         return extra_kwargs
-
-
-class RecursiveField(serializers.Serializer):
-    """
-    Поле сериалайзер для ссылки на самого себя
-    """
-    def to_representation(self, value):
-        serializer = self.parent.parent.__class__(value, context=self.context)
-        return serializer.data
-
-
-class CommentRepliesSerializer(CommentSerializer):
-    """
-    Сериалайзер для вложенных комментариев
-    """
-    replies = RecursiveField(read_only=True, many=True)
-
-    class Meta(CommentSerializer.Meta):
-        fields = CommentSerializer.Meta.fields + ['replies']
