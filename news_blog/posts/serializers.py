@@ -41,10 +41,10 @@ class CommentSerializer(serializers.ModelSerializer):
         проверить к одному ли посту относятся создаваемый
         комментарий и родительский комментарий"""
 
-        parent_comment = data.get('parent', None)
+        parent_comment = data.get('parent')
 
         if parent_comment:
-            post_of_new_comment = data.get('post', None)
+            post_of_new_comment = data.get('post')
 
             post_of_parent_comment = parent_comment.post
 
