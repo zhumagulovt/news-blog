@@ -37,7 +37,7 @@ class TestPosts:
         data = {
             'title': post.title,
             'content': post.content,
-            'category_id': category.id
+            'category': category.name
         }
 
         response = api_client.post(self.URL, data=data)
