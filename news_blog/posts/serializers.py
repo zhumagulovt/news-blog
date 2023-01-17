@@ -15,21 +15,12 @@ class CategorySerializer(serializers.ModelSerializer):
 class PostSerializer(serializers.ModelSerializer):
     author = UserSerializer(read_only=True)
     is_liked = serializers.BooleanField(read_only=True, default=None)
-
-    # Поле для получения категории
-    category = CategorySerializer(read_only=True)
-
-    # Поле для создания или изменения категории по id
-    category_id = serializers.PrimaryKeyRelatedField(
-        source='category',
-        write_only=True,
-        queryset=Category.objects.all()
-    )
+    category = serializers.SlugRelatedField(slug_field='name', queryset=Category.objects.all())
 
     class Meta:
         model = Post
         fields = ['id', 'title', 'author', 'content', 'is_liked',
-                  'category', 'category_id', 'created_at', 'image']
+                  'category', 'created_at', 'image']
 
 
 class CommentSerializer(serializers.ModelSerializer):
