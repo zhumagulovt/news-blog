@@ -9,6 +9,12 @@ class PostAdmin(admin.ModelAdmin):
     list_filter = ('title', 'category', 'created_at')
     search_fields = ('title',)
 
+    def get_form(self, request, obj=None, change=False, **kwargs):
+        self.exclude = ('likes',)
+
+        form = super(PostAdmin, self).get_form(request, obj, **kwargs)
+        return form
+
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
