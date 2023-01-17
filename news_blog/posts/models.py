@@ -6,7 +6,7 @@ User = get_user_model()
 
 class Category(models.Model):
     """Модель для категорий постов"""
-    name = models.CharField("Название", max_length=150)
+    name = models.CharField("Название", max_length=150, unique=True)
 
     def __str__(self):
         return self.name
