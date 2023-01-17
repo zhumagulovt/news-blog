@@ -19,8 +19,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from .models import Comment
 from .serializers import (
     PostSerializer,
-    CommentSerializer,
-    CommentRepliesSerializer
+    CommentSerializer
 )
 from .permissions import IsOwnerOrReadOnly
 from . import services
@@ -87,7 +86,7 @@ class PostViewSet(ModelViewSet):
 
     # Сериалайзер не покажет replies в swagger, поэтому создал OpenApiExample для ясности
     @extend_schema(
-        responses=CommentRepliesSerializer, examples=[OpenApiExample(
+        responses=CommentSerializer, examples=[OpenApiExample(
             name="Example",
             value=[
                 {"id": 1, "post": 1, "author": 1, "content": "This is comment",
@@ -109,7 +108,7 @@ class PostViewSet(ModelViewSet):
         # Вложенные комментарии будут получены в сериалайзере
         root_comments = services.get_root_comments(post)
 
-        serializer = CommentRepliesSerializer(root_comments, many=True)
+        serializer = CommentSerializer(root_comments, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
