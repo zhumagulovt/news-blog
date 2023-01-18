@@ -25,14 +25,6 @@ from .permissions import IsOwnerOrReadOnly
 from . import services
 
 
-@extend_schema_view(
-    list=extend_schema(description="Получить все посты"),
-    create=extend_schema(description="Создать новый пост"),
-    retrieve=extend_schema(description="Получить данные о посте"),
-    partial_update=extend_schema(description="Частично изменить пост"),
-    update=extend_schema(description="Полностью изменить пост"),
-    destroy=extend_schema(description="Удалить пост"),
-)
 class PostViewSet(ModelViewSet):
 
     serializer_class = PostSerializer
