@@ -10,5 +10,7 @@ router.register('comments', viewsets.CommentViewSet)
 
 urlpatterns = [
     path('categories/', views.CategoryListAPIView.as_view()),
+    path('posts/my_posts/', views.UserPostListAPIView.as_view()),
+    path('posts/favorites/', views.FavoritePostListAPIView.as_view()),
     path('', include(router.urls))
 ]
